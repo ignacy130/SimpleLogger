@@ -1,11 +1,16 @@
 ﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
+using System.Linq;
+using System.IO;
+using SimpleLogger.Logging.Handlers;
 
 namespace SimpleLogger.Logging
 {
     internal class LogPublisher : ILoggerHandlerManager
     {
         private readonly IList<ILoggerHandler> _loggerHandlers;
-        private readonly IList<LogMessage> _messages;
+        private IList<LogMessage> _messages;
 
         public LogPublisher()
         {
@@ -20,7 +25,18 @@ namespace SimpleLogger.Logging
                 loggerHandler.Publish(logMessage);
         }
 
-        public ILoggerHandlerManager AddHandler(ILoggerHandler loggerHandler)
+		public IList<LogMessage> GetPublishedLogs()
+		{
+			return GetHandler<FileLoggerHandler>().Read();
+		}
+
+		public T GetHandler<T>() where T : ILoggerHandler
+		{
+			var handler = _loggerHandlers.OfType<T>().First();
+			return handler;
+		}
+
+		public ILoggerHandlerManager AddHandler(ILoggerHandler loggerHandler)
         {
             if (loggerHandler != null)
                 _loggerHandlers.Add(loggerHandler);
