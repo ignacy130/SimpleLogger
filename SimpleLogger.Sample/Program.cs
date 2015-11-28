@@ -1,6 +1,7 @@
 ﻿using System;
 using SimpleLogger.Logging.Handlers;
 using SimpleLogger.Logging.Module;
+using static SimpleLogger.Logger;
 
 namespace SimpleLogger.Sample
 {
@@ -17,11 +18,14 @@ namespace SimpleLogger.Sample
             // Fast logging (monitor name of class and methods from which is the application logged)
             Logger.Log();
 
-            // We define a log message
-            Logger.Log("Hello world");
+			var n = new { name = "lol", surname = "lol2" };
 
-            // We can define the level (type) of message
-            Logger.Log(Logger.Level.Fine, "Explicit define level");
+            // We define a log message
+            Logger.Log(Level.Info, n.ToString());
+
+			// We can define the level (type) of message
+
+			Logger.Log(Logger.Level.Fine, "Explicit define level");
 
             // Explicit definition of the class from which the logging
             Logger.Log<Program>("Explicit define log class");
@@ -42,17 +46,7 @@ namespace SimpleLogger.Sample
                 Logger.Log(exception);
                 Logger.Log<Program>(exception);
             }
-
-            // Special feature - debug logging
-
-            Logger.Debug.Log("Debug log");
-            Logger.Debug.Log<Program>("Debug log");
-
-            Logger.DebugOff();
-            Logger.Debug.Log("Not-logged message");
-
-            Logger.DebugOn();
-            Logger.Debug.Log("I'am back!");
+			var logs = Logger.GetPublishedLogs();
 
             Console.ReadKey();
         }
