@@ -7,7 +7,7 @@ namespace SimpleLogger.Logging.Handlers
     {
         private readonly ILoggerFormatter _loggerFormatter;
 
-        public ConsoleLoggerHandler() : this(new DefaultLoggerFormatter()) { }
+        public ConsoleLoggerHandler() : this(new JsonFormatter()) { }
 
         public ConsoleLoggerHandler(ILoggerFormatter loggerFormatter)
         {

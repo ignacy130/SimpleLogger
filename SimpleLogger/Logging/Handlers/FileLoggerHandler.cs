@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using SimpleLogger.Logging.Formatters;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace SimpleLogger.Logging.Handlers
 {
@@ -14,7 +16,7 @@ namespace SimpleLogger.Logging.Handlers
 
         public FileLoggerHandler(string fileName) : this(fileName, string.Empty) { }
 
-        public FileLoggerHandler(string fileName, string directory) : this(new DefaultLoggerFormatter(), fileName, directory) { }
+        public FileLoggerHandler(string fileName, string directory) : this(new JsonFormatter(), fileName, directory) { }
 
         public FileLoggerHandler(ILoggerFormatter loggerFormatter) : this(loggerFormatter, CreateFileName()) { }
 
@@ -36,11 +38,31 @@ namespace SimpleLogger.Logging.Handlers
                     directoryInfo.Create();
             }
 
-            using (var writer = new StreamWriter(File.Open(Path.Combine(_directory, _fileName), FileMode.Append)))
-                writer.WriteLine(_loggerFormatter.ApplyFormat(logMessage));
-        }
+			var fs = File.Open(Path.Combine(_directory, _fileName), FileMode.Append);
 
-        private static string CreateFileName()
+			using (var writer = new StreamWriter(fs))
+			{
+				writer.WriteLine(_loggerFormatter.ApplyFormat(logMessage));
+				writer.Write(',');
+			}
+        }
+		public IList<LogMessage> Read()
+		{
+			var pseudojson =string.Empty;
+
+			var fs = File.Open(Path.Combine(_directory, _fileName), FileMode.Open);
+			using (var reader = new StreamReader(fs))
+			{
+				pseudojson = reader.ReadToEnd();
+			}
+			pseudojson = pseudojson.Insert(0, "[");
+			pseudojson = pseudojson.Remove(pseudojson.Length - 1, 1);
+			pseudojson += "]";
+			var logs = JsonConvert.DeserializeObject<IList<LogMessage>>(pseudojson);
+			return logs;
+		}
+
+		private static string CreateFileName()
         {
             var currentDate = DateTime.Now;
             var guid = Guid.NewGuid();

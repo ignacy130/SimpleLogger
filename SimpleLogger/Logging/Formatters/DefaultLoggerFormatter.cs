@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace SimpleLogger.Logging.Formatters
 {
     internal class DefaultLoggerFormatter : ILoggerFormatter
@@ -9,4 +11,13 @@ namespace SimpleLogger.Logging.Formatters
                             logMessage.CallingMethod, logMessage.Text);
         }
     }
+
+	internal class JsonFormatter : ILoggerFormatter
+	{
+		public string ApplyFormat(LogMessage logMessage)
+		{
+			var json = JsonConvert.SerializeObject(logMessage);
+			return json;
+		}
+	}
 }

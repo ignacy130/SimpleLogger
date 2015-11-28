@@ -6,6 +6,7 @@ using System.Reflection;
 using SimpleLogger.Logging;
 using SimpleLogger.Logging.Handlers;
 using SimpleLogger.Logging.Module;
+using SimpleLogger.Logging.Formatters;
 
 namespace SimpleLogger
 {
@@ -41,7 +42,12 @@ namespace SimpleLogger
             }
         }
 
-        public static void DefaultInitialization()
+		public static IList<LogMessage> GetPublishedLogs()
+		{
+			return LogPublisher.GetPublishedLogs();
+		}
+
+		public static void DefaultInitialization()
         {
             LoggerHandlerManager
                 .AddHandler(new ConsoleLoggerHandler())
@@ -119,7 +125,7 @@ namespace SimpleLogger
             var currentDateTime = DateTime.Now;
 
             ModuleManager.BeforeLog();
-            var logMessage = new LogMessage(level, message, currentDateTime, callingClass, callingMethod, lineNumber);
+            var logMessage = new LogMessage(new JsonFormatter(), level, message, currentDateTime, callingClass, callingMethod, lineNumber);
             LogPublisher.Publish(logMessage);
             ModuleManager.AfterLog(logMessage);
         }
